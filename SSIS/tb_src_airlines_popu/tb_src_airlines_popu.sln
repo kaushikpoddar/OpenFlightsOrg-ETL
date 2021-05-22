@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31105.61
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{159641D6-6404-4A2A-AE62-294DE0FE8301}") = "tb_src_airlines_popu", "tb_src_airlines_popu\tb_src_airlines_popu.dtproj", "{D7F8A7FA-6699-42DD-8EA7-7FB2ADF5B154}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Development|Default = Development|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D7F8A7FA-6699-42DD-8EA7-7FB2ADF5B154}.Development|Default.ActiveCfg = Development
+		{D7F8A7FA-6699-42DD-8EA7-7FB2ADF5B154}.Development|Default.Build.0 = Development
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {06C158D5-2F6C-42AF-BE1C-CCACB8EBCBEE}
+	EndGlobalSection
+EndGlobal
