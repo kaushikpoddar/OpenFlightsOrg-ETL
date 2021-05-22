@@ -1,0 +1,97 @@
+LOAD CSV WITH HEADERS FROM 'file:///airline-safety.csv' AS row 
+CREATE (n:tb_airline_safety) SET n=row
+
+LOAD CSV WITH HEADERS FROM 'file:///airlines.csv' AS row 
+CREATE (n:tb_airlines) SET n=row
+
+LOAD CSV WITH HEADERS FROM 'file:///airports.csv' AS row 
+CREATE (n:tb_airports) SET n=row
+
+LOAD CSV WITH HEADERS FROM 'file:///countries.csv' AS row 
+CREATE (n:tb_countries) SET n=row
+
+LOAD CSV WITH HEADERS FROM 'file:///planes.csv' AS row 
+CREATE (n:tb_planes) SET n=row
+
+LOAD CSV WITH HEADERS FROM 'file:///routes.csv' AS row 
+CREATE (n:tb_routes) SET n=row
+
+CREATE INDEX ON :tb_airline_safety(airline)
+CREATE INDEX ON :tb_airlines(airlineid)
+CREATE INDEX ON :tb_airports(airportid)
+CREATE INDEX ON :tb_countries(dafif)
+CREATE INDEX ON :tb_planes(name)
+CREATE INDEX ON :tb_routes(airlineid,sourceairportid,destinationairportid,equipment)
+
+MATCH(r:tb_fact_routes), (a:tb_dim_airlines) WHERE r.airlineid = a.airlineid
+CREATE (a)-[:FLY_ON]->(r)
+------------------------------
+
+
+SQL: select * from fly_tb.tb_dim_airlines where country = 'IRELAND'
+
+CQL: MATCH(n:tb_airlines) WHERE n.country = 'Ireland' RETURN n.airlineid,n.name,n.icao,n.callsign,n.country,n.country_iso
+
+Notes: In the above queries, we are fetching the airlines details from SQL Server and Neo4j for Ireland.
+
+------------------------------------
+
+SQL: SELECT * FROM fly_tb.tb_dim_planes WHERE name LIKE '%Boeing%'
+
+CQL: MATCH(n:tb_planes) WHERE n.name CONTAINS 'Boeing' RETURN n.name,n.iata,n.icao
+
+Notes: In the above queries, we are fetching the plane models which are created by manufacturer Boeing from SQL Server and Neo4j.
+
+------------------------------------
+
+SQL: SELECT name, city, country, tzdatabasetimezone FROM fly_tb.tb_dim_airports 
+     WHERE country IN ('Ireland','Nigeria') ORDER BY country, tzdatabasetimezone
+
+CQL: MATCH(n:tb_airports) WHERE n.country IN ['Ireland','Nigeria'] 
+     RETURN n.name, n.city, n.country, n.tzdatabasetimezone ORDER BY n.country, n.tzdatabasetimezone
+	 
+Notes: In the above queries, we are fetching the name, city, country, and tzdatabasetimezone of all airports in Ireland and Nigeria from SQL Server and Neo4j.
+
+------------------------------------
+
+SQL: select airlineid,name,country from fly_tb.tb_dim_airlines where active = 'Y'
+
+CQL: MATCH(n:tb_airlines) WHERE n.active = 'Y' RETURN n.airlineid, n.name, n.country
+
+Notes: In the above queries, we are fetching the airline details from the airline table which are currently active from SQL Server and Neo4j.
+
+------------------------------------
+
+SQL: select name, altitude from fly_tb.tb_dim_airports order by altitude desc
+
+CQL: MATCH(n:tb_airports) RETURN n.name, n.altitude
+     ORDER BY toInteger(n.altitude) DESC
+	 
+Notes: In the above queries, we are fetching the name and altitude of the airports ordered by the altitude of the airport in SQL Server and Neo 4j.
+
+------------------------------------
+
+SQL: SELECT country,tzdatabasetimezone FROM fly_tb.tb_dim_airports WHERE tzdatabasetimezone <> '' 
+     GROUP BY country,tzdatabasetimezone ORDER BY country
+
+CQL: MATCH(n:tb_airports) WHERE n.tzdatabasetimezone <> '\N'  
+     RETURN DISTINCT n.country, n.tzdatabasetimezone ORDER BY n.country 
+
+Notes: In the above queries, we are fetching the countries and their respective timezones where timezone is not an empty field in SQL Server and Neo4j.
+
+-------------------------------------
+
+SQL: select
+          airline.name
+        , routes.sourceairport
+    	, routes.destinationairport
+    	, routes.stops
+     FROM fly_tb.tb_fact_routes routes
+     INNER JOIN (SELECT airlineid, name FROM fly_tb.tb_dim_airlines WHERE name = 'Ryanair') airline
+     ON routes.airlineid = airline.airlineid
+
+CQL: MATCH (a:tb_airlines)-->(r:tb_routes) WHERE a.name = 'Ryanair'
+     RETURN a.name AS Name, r.sourceairport AS SrcAirport, r.destinationairport AS DestAirport, r.stops AS Stops
+
+
+Notes: In the above queries, we are joining 2 tables (routes and airlines respectively) to fetch all the source and destination airports for Ryanair in SQL Server and Neo4j.
